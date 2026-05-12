@@ -36,7 +36,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 .ais-select:focus{border-color:#185FA5;box-shadow:0 0 0 3px rgba(24,95,165,0.12)}
 .ais-divider{border:none;border-top:1px solid #eef0f3;margin:8px 0}
 .results{background:#0f2a4a;border-radius:12px;padding:1.25rem;margin-bottom:1rem;color:#fff}
-.result-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
+.result-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0.75rem}
+.triss-detail{background:rgba(255,255,255,0.05);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.75rem;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.9;display:none}
+.triss-detail .triss-row{display:flex;justify-content:space-between;align-items:baseline}
+.triss-detail .triss-row .k{color:rgba(255,255,255,0.4)}
+.triss-detail .triss-row .v{color:rgba(255,255,255,0.8);font-family:monospace;font-size:13px}
+.triss-detail .triss-total{border-top:1px solid rgba(255,255,255,0.1);margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;align-items:baseline}
+.triss-detail .triss-total .k{color:rgba(255,255,255,0.5);font-weight:600}
+.triss-detail .triss-total .v{color:#7ec8ff;font-family:monospace;font-size:15px;font-weight:700}
 @media(max-width:500px){.result-cards{grid-template-columns:1fr}}
 .result-card{background:rgba(255,255,255,0.08);border-radius:10px;padding:0.875rem 1rem;text-align:center}
 .result-card .val{font-size:30px;font-weight:700;line-height:1.1;color:#7ec8ff}
@@ -70,6 +77,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 .btn-reset{width:100%;padding:9px;font-size:13px;border-radius:10px;border:1px solid #d0d5de;background:#fff;color:#666;cursor:pointer;margin-top:8px;transition:background 0.2s}
 .btn-reset:hover{background:#f4f5f7}
 .note{font-size:11px;color:#aaa;text-align:center;margin-top:1rem;line-height:1.6}
+.formula-section{background:#fff;border:1px solid #e0e4ea;border-radius:12px;margin-bottom:1rem;overflow:hidden}
+.formula-section summary{font-size:13px;font-weight:600;color:#185FA5;padding:0.875rem 1.25rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;user-select:none}
+.formula-section summary::-webkit-details-marker{display:none}
+.formula-section summary::after{content:"▼";font-size:10px;margin-left:auto;color:#aaa;transition:transform 0.2s}
+.formula-section[open] summary::after{transform:rotate(180deg)}
+.formula-section summary:hover{background:#f8f9fb}
+.formula-body{padding:0 1.25rem 1.25rem;border-top:1px solid #eef0f3;display:flex;flex-direction:column;gap:1rem}
+.formula-block{padding-top:1rem}
+.formula-title{font-size:13px;font-weight:600;color:#0f2a4a;margin-bottom:4px}
+.formula-desc{font-size:12px;color:#666;line-height:1.7;margin-bottom:8px}
+.formula-eq{font-size:13px;font-family:Georgia,serif;background:#f4f5f7;border-left:3px solid #185FA5;padding:6px 12px;border-radius:0 6px 6px 0;margin-bottom:8px;color:#0f2a4a}
+.formula-table{width:100%;border-collapse:collapse;font-size:12px}
+.formula-table th{background:#f4f5f7;color:#555;font-weight:600;padding:5px 10px;text-align:left;border:1px solid #e0e4ea}
+.formula-table td{padding:5px 10px;border:1px solid #e0e4ea;color:#333}
 </style>
 </head>
 <body>
@@ -140,7 +161,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 
   <div class="section">
     <div class="section-title">❤️ バイタルサイン</div>
-    <div class="grid3">
+    <div class="grid2">
       <div class="field">
         <label>収縮期血圧（mmHg）</label>
         <input type="number" id="sbp" min="0" max="300" placeholder="例：120">
@@ -148,10 +169,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
       <div class="field">
         <label>呼吸数（/分）</label>
         <input type="number" id="rr" min="0" max="60" placeholder="例：16">
-      </div>
-      <div class="field">
-        <label>心拍数（/分）</label>
-        <input type="number" id="hr" min="0" max="300" placeholder="例：80">
       </div>
     </div>
   </div>
@@ -161,7 +178,75 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
     <div id="aisRows"></div>
   </div>
 
-  <div class="results" id="results">
+  <details class="formula-section">
+    <summary>📐 各スコアの計算式を見る</summary>
+    <div class="formula-body">
+
+      <div class="formula-block">
+        <div class="formula-title">AIS（Abbreviated Injury Scale）</div>
+        <div class="formula-desc">各部位の損傷を0〜6で評価する重症度スケール。</div>
+        <table class="formula-table">
+          <tr><th>スコア</th><th>重症度</th><th>意味</th></tr>
+          <tr><td>0</td><td>損傷なし</td><td>—</td></tr>
+          <tr><td>1</td><td>軽傷</td><td>Minor</td></tr>
+          <tr><td>2</td><td>中等症</td><td>Moderate</td></tr>
+          <tr><td>3</td><td>重症</td><td>Serious</td></tr>
+          <tr><td>4</td><td>重篤</td><td>Severe</td></tr>
+          <tr><td>5</td><td>最重症</td><td>Critical</td></tr>
+          <tr><td>6</td><td>致死的</td><td>Unsurvivable</td></tr>
+        </table>
+      </div>
+
+      <div class="formula-block">
+        <div class="formula-title">ISS（Injury Severity Score）</div>
+        <div class="formula-desc">6部位のAISスコアのうち、上位3部位の二乗和。最大値は75（3部位すべてAIS=5の場合）。AIS=6がひとつでもあれば自動的にISS=75。</div>
+        <div class="formula-eq">ISS = AIS₁² + AIS₂² + AIS₃²</div>
+        <table class="formula-table">
+          <tr><th>ISS</th><th>重症度分類</th></tr>
+          <tr><td>1〜8</td><td>軽傷（Minor）</td></tr>
+          <tr><td>9〜15</td><td>中等症（Moderate）</td></tr>
+          <tr><td>16〜24</td><td>重症（Serious）</td></tr>
+          <tr><td>25〜39</td><td>重篤（Severe）</td></tr>
+          <tr><td>40〜74</td><td>最重症（Critical）</td></tr>
+          <tr><td>75</td><td>致死的（Unsurvivable）</td></tr>
+        </table>
+      </div>
+
+      <div class="formula-block">
+        <div class="formula-title">RTS（Revised Trauma Score）</div>
+        <div class="formula-desc">GCS・収縮期血圧・呼吸数をコード化して重み付け加算。最大値は7.84（すべて正常）。</div>
+        <div class="formula-eq">RTS = 0.9368×GCS<sub>code</sub> + 0.7326×SBP<sub>code</sub> + 0.2908×RR<sub>code</sub></div>
+        <table class="formula-table">
+          <tr><th>コード</th><th>GCS</th><th>SBP (mmHg)</th><th>RR (/分)</th></tr>
+          <tr><td>4</td><td>13〜15</td><td>&gt;89</td><td>10〜29</td></tr>
+          <tr><td>3</td><td>9〜12</td><td>76〜89</td><td>6〜9</td></tr>
+          <tr><td>2</td><td>6〜8</td><td>50〜75</td><td>1〜5</td></tr>
+          <tr><td>1</td><td>4〜5</td><td>1〜49</td><td>&gt;29</td></tr>
+          <tr><td>0</td><td>3</td><td>0</td><td>0</td></tr>
+        </table>
+      </div>
+
+      <div class="formula-block">
+        <div class="formula-title">Ps（TRISS法・生存確率）</div>
+        <div class="formula-desc">RTS・ISS・年齢・受傷機転からロジスティック回帰で生存確率を算出。係数はBoyd CR et al. 1987に基づく。</div>
+        <div class="formula-eq">Ps = 1 / (1 + e<sup>−b</sup>)</div>
+        <div class="formula-eq">b = b₀ + 0.8085×RTS − 0.0835×ISS + 年齢補正</div>
+        <table class="formula-table">
+          <tr><th>係数</th><th>鈍的外傷</th><th>鋭的外傷</th></tr>
+          <tr><td>b₀（切片）</td><td>−0.4499</td><td>−2.5355</td></tr>
+          <tr><td>RTS係数</td><td>0.8085</td><td>0.9934</td></tr>
+          <tr><td>ISS係数</td><td>−0.0835</td><td>−0.0651</td></tr>
+          <tr><td>年齢補正（≥55歳）</td><td colspan="2">−1.1422</td></tr>
+        </table>
+      </div>
+
+    </div>
+  </details>
+
+  <button class="btn-calc" onclick="calculate()">スコアを計算する</button>
+  <button class="btn-reset" onclick="resetAll()">リセット</button>
+
+  <div class="results" id="results" style="margin-top:1rem">
     <div class="result-cards">
       <div class="result-card">
         <div class="val" id="issVal">—</div>
@@ -179,6 +264,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
         <div class="lbl">Ps（生存確率）</div>
         <div class="sub" id="psLabel">TRISS法</div>
       </div>
+    </div>
+
+    <div class="triss-detail" id="trissDetail">
+      <div class="triss-row"><span class="k">b₀（切片：受傷機転）</span><span class="v" id="td_b0">—</span></div>
+      <div class="triss-row"><span class="k">0.8085 × RTS</span><span class="v" id="td_rts">—</span></div>
+      <div class="triss-row"><span class="k">−0.0835 × ISS</span><span class="v" id="td_iss">—</span></div>
+      <div class="triss-row"><span class="k">年齢補正（≥55歳: −1.1422）</span><span class="v" id="td_age">—</span></div>
+      <div class="triss-total"><span class="k">b 値合計</span><span class="v" id="td_b">—</span></div>
     </div>
 
     <div class="severity-wrap" id="severityWrap" style="display:none">
@@ -203,9 +296,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
       <div class="ps-detail" id="psDetail"></div>
     </div>
   </div>
-
-  <button class="btn-calc" onclick="calculate()">スコアを計算する</button>
-  <button class="btn-reset" onclick="resetAll()">リセット</button>
 
   <p class="note">※ 本ツールは参考値の算出を目的としています。臨床判断は必ず医師が行ってください。<br>TRISS法（Boyd CR et al. 1987）に基づき算出しています。</p>
 </div>
@@ -315,8 +405,10 @@ function calculate() {
   const rts = 0.9368 * gc + 0.7326 * sc + 0.2908 * rc;
 
   const ageCoeff = age >= 55 ? -1.1422 : 0;
-  const b0 = mech === "penetrating" ? -1.0286 : -0.4499;
-  const b  = b0 + (0.8085 * rts) - (0.0835 * iss) + ageCoeff;
+  const b0      = mech === "penetrating" ? -2.5355 : -0.4499;
+  const rtsCoef = mech === "penetrating" ?  0.9934 :  0.8085;
+  const issCoef = mech === "penetrating" ? -0.0651 : -0.0835;
+  const b  = b0 + (rtsCoef * rts) + (issCoef * iss) + ageCoeff;
   const ps = 1 / (1 + Math.exp(-b));
 
   document.getElementById("issVal").textContent = iss;
@@ -331,6 +423,15 @@ function calculate() {
 
   document.getElementById("severityWrap").style.display = "block";
   document.getElementById("psWrap").style.display = "block";
+
+  const rtsComponent = rtsCoef * rts;
+  const issComponent = issCoef * iss;
+  document.getElementById("trissDetail").style.display = "block";
+  document.getElementById("td_b0").textContent  = b0.toFixed(4) + "（" + (mech==="penetrating"?"鋭的":"鈍的") + "）";
+  document.getElementById("td_rts").textContent = (rtsComponent >= 0 ? "+" : "") + rtsComponent.toFixed(4) + "（" + rtsCoef + "×RTS）";
+  document.getElementById("td_iss").textContent = issComponent.toFixed(4) + "（" + issCoef + "×ISS）";
+  document.getElementById("td_age").textContent = ageCoeff !== 0 ? ageCoeff.toFixed(4) : "0（<55歳）";
+  document.getElementById("td_b").textContent   = b.toFixed(4);
 
   const segs   = ["minor","moderate","serious","severe","critical","unsurvivable"];
   const thresh = [0, 8, 15, 24, 39, 74];
@@ -356,7 +457,7 @@ function calculate() {
 
   const mechLabel = mech === "penetrating" ? "鋭的外傷" : mech === "blunt" ? "鈍的外傷" : "機転未選択";
   document.getElementById("psDetail").innerHTML =
-    `<span>RTS: ${rts.toFixed(2)}</span><span>${mechLabel} / ${age > 0 ? age + "歳" : "年齢未入力"}</span>`;
+    `<span>Ps = 1/(1+e<sup>−b</sup>)</span><span>${mechLabel} / ${age > 0 ? age + "歳" : "年齢未入力"}</span>`;
 }
 
 function resetAll() {
@@ -364,7 +465,6 @@ function resetAll() {
   document.getElementById("mechanism").value = "";
   document.getElementById("sbp").value = "";
   document.getElementById("rr").value = "";
-  document.getElementById("hr").value = "";
   ["gcsE","gcsV","gcsM"].forEach(id => {
     document.getElementById(id).selectedIndex = 0;
   });
@@ -380,6 +480,7 @@ function resetAll() {
   document.getElementById("issFormula").textContent = "";
   document.getElementById("severityWrap").style.display = "none";
   document.getElementById("psWrap").style.display = "none";
+  document.getElementById("trissDetail").style.display = "none";
 }
 
 renderAis();
