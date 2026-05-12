@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>外傷スコア計算 — ISS / PS</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;background:#f4f5f7;color:#1a1a1a;min-height:100vh;padding:2rem 1rem}
+.container{max-width:720px;margin:0 auto}
+.header{margin-bottom:1.5rem}
+.header h1{font-size:22px;font-weight:600;color:#0f2a4a}
+.header p{font-size:13px;color:#666;margin-top:4px}
+.section{background:#fff;border:1px solid #e0e4ea;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.section-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:500px){.grid2,.grid3{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:13px;color:#555}
+.field select,.field input[type=number]{font-size:14px;padding:8px 10px;border-radius:8px;border:1px solid #d0d5de;background:#fafbfc;color:#1a1a1a;width:100%;outline:none}
+.field select:focus,.field input:focus{border-color:#185FA5;box-shadow:0 0 0 3px rgba(24,95,165,0.12)}
+.ais-row{display:grid;grid-template-columns:150px 1fr 64px;gap:10px;align-items:center;margin-bottom:8px}
+@media(max-width:500px){.ais-row{grid-template-columns:1fr;gap:4px}}
+.ais-label{font-size:13px;font-weight:500;color:#222}
+.ais-desc{font-size:11px;color:#999}
+.ais-badge{font-size:14px;font-weight:600;text-align:center;padding:5px 8px;border-radius:8px;background:#f0f1f3;color:#555;min-width:48px}
+.ais-badge.s0{background:#f0f1f3;color:#888}
+.ais-badge.s1{background:#EAF3DE;color:#27500A}
+.ais-badge.s2{background:#FAEEDA;color:#633806}
+.ais-badge.s3{background:#FAECE7;color:#712B13}
+.ais-badge.s4{background:#FCEBEB;color:#791F1F}
+.ais-badge.s5{background:#F7C1C1;color:#501313}
+.ais-badge.s6{background:#E24B4A;color:#fff}
+.ais-select{font-size:13px;padding:6px 8px;border-radius:8px;border:1px solid #d0d5de;background:#fafbfc;color:#1a1a1a;width:100%;outline:none}
+.ais-select:focus{border-color:#185FA5;box-shadow:0 0 0 3px rgba(24,95,165,0.12)}
+.ais-divider{border:none;border-top:1px solid #eef0f3;margin:8px 0}
+.results{background:#0f2a4a;border-radius:12px;padding:1.25rem;margin-bottom:1rem;color:#fff}
+.result-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
+@media(max-width:500px){.result-cards{grid-template-columns:1fr}}
+.result-card{background:rgba(255,255,255,0.08);border-radius:10px;padding:0.875rem 1rem;text-align:center}
+.result-card .val{font-size:30px;font-weight:700;line-height:1.1;color:#7ec8ff}
+.result-card .lbl{font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px}
+.result-card .sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:4px;min-height:14px}
+.result-card .formula{font-size:10px;color:rgba(255,255,255,0.35);margin-top:3px;font-style:italic}
+.severity-wrap{margin-top:0.875rem}
+.severity-title{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:5px}
+.severity-bar{display:flex;gap:3px}
+.severity-seg{height:7px;border-radius:4px;flex:1;background:rgba(255,255,255,0.12);transition:background 0.3s}
+.severity-seg.active-minor{background:#639922}
+.severity-seg.active-moderate{background:#EF9F27}
+.severity-seg.active-serious{background:#D85A30}
+.severity-seg.active-severe{background:#E24B4A}
+.severity-seg.active-critical{background:#A32D2D}
+.severity-seg.active-unsurvivable{background:#501313}
+.severity-label{font-size:12px;color:rgba(255,255,255,0.7);margin-top:6px;font-weight:500}
+.ps-wrap{margin-top:0.875rem}
+.ps-title{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:5px}
+.ps-track{height:10px;border-radius:5px;background:linear-gradient(90deg,#E24B4A 0%,#EF9F27 40%,#639922 80%,#27500A 100%);position:relative}
+.ps-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #0f2a4a;box-shadow:0 0 0 2px #fff;transition:left 0.4s;pointer-events:none}
+.ps-labels{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px}
+.ps-detail{font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;display:flex;justify-content:space-between}
+.gcs-total{display:flex;align-items:baseline;gap:8px;margin-top:8px}
+.gcs-total .num{font-size:24px;font-weight:700;color:#0f2a4a}
+.gcs-total .denom{font-size:13px;color:#999}
+.gcs-total .label{font-size:12px;margin-left:4px;font-weight:500}
+.btn-calc{width:100%;padding:12px;font-size:15px;font-weight:600;border-radius:10px;border:none;background:#185FA5;color:#fff;cursor:pointer;transition:background 0.2s,transform 0.1s;letter-spacing:0.02em}
+.btn-calc:hover{background:#0C447C}
+.btn-calc:active{transform:scale(0.99)}
+.btn-reset{width:100%;padding:9px;font-size:13px;border-radius:10px;border:1px solid #d0d5de;background:#fff;color:#666;cursor:pointer;margin-top:8px;transition:background 0.2s}
+.btn-reset:hover{background:#f4f5f7}
+.note{font-size:11px;color:#aaa;text-align:center;margin-top:1rem;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>外傷スコア計算</h1>
+    <p>AISスコアからISS・RTS・Ps（生存確率）を算出します</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">👤 患者基本情報</div>
+    <div class="grid2">
+      <div class="field">
+        <label>年齢</label>
+        <input type="number" id="age" min="0" max="120" placeholder="例：45">
+      </div>
+      <div class="field">
+        <label>受傷機転</label>
+        <select id="mechanism">
+          <option value="">選択してください</option>
+          <option value="blunt">鈍的外傷（Blunt）</option>
+          <option value="penetrating">鋭的外傷（Penetrating）</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🧠 グラスゴー昏睡尺度（GCS）</div>
+    <div class="grid3">
+      <div class="field">
+        <label>開眼（E）</label>
+        <select id="gcsE">
+          <option value="4">4 — 自発的</option>
+          <option value="3">3 — 呼びかけ</option>
+          <option value="2">2 — 疼痛</option>
+          <option value="1">1 — なし</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>言語（V）</label>
+        <select id="gcsV">
+          <option value="5">5 — 見当識あり</option>
+          <option value="4">4 — 混乱</option>
+          <option value="3">3 — 異常言語</option>
+          <option value="2">2 — 理解不能</option>
+          <option value="1">1 — なし</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>運動（M）</label>
+        <select id="gcsM">
+          <option value="6">6 — 命令に従う</option>
+          <option value="5">5 — 疼痛局在</option>
+          <option value="4">4 — 逃避（屈曲）</option>
+          <option value="3">3 — 異常屈曲</option>
+          <option value="2">2 — 伸展</option>
+          <option value="1">1 — なし</option>
+        </select>
+      </div>
+    </div>
+    <div class="gcs-total">
+      <span class="num" id="gcsTotal">15</span>
+      <span class="denom">/ 15</span>
+      <span class="label" id="gcsLabel" style="color:#3B6D11">正常範囲</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">❤️ バイタルサイン</div>
+    <div class="grid3">
+      <div class="field">
+        <label>収縮期血圧（mmHg）</label>
+        <input type="number" id="sbp" min="0" max="300" placeholder="例：120">
+      </div>
+      <div class="field">
+        <label>呼吸数（/分）</label>
+        <input type="number" id="rr" min="0" max="60" placeholder="例：16">
+      </div>
+      <div class="field">
+        <label>心拍数（/分）</label>
+        <input type="number" id="hr" min="0" max="300" placeholder="例：80">
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🫁 AISスコア（各部位）</div>
+    <div id="aisRows"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="result-cards">
+      <div class="result-card">
+        <div class="val" id="issVal">—</div>
+        <div class="lbl">ISS</div>
+        <div class="sub" id="issTop">Injury Severity Score</div>
+        <div class="formula" id="issFormula"></div>
+      </div>
+      <div class="result-card">
+        <div class="val" id="rtsVal">—</div>
+        <div class="lbl">RTS</div>
+        <div class="sub">Revised Trauma Score</div>
+      </div>
+      <div class="result-card">
+        <div class="val" id="psVal">—</div>
+        <div class="lbl">Ps（生存確率）</div>
+        <div class="sub" id="psLabel">TRISS法</div>
+      </div>
+    </div>
+
+    <div class="severity-wrap" id="severityWrap" style="display:none">
+      <div class="severity-title">ISS 重症度分類</div>
+      <div class="severity-bar">
+        <div class="severity-seg" id="seg0"></div>
+        <div class="severity-seg" id="seg1"></div>
+        <div class="severity-seg" id="seg2"></div>
+        <div class="severity-seg" id="seg3"></div>
+        <div class="severity-seg" id="seg4"></div>
+        <div class="severity-seg" id="seg5"></div>
+      </div>
+      <div class="severity-label" id="severityText"></div>
+    </div>
+
+    <div class="ps-wrap" id="psWrap" style="display:none">
+      <div class="ps-title">生存確率インジケーター</div>
+      <div class="ps-track">
+        <div class="ps-dot" id="psDot" style="left:50%"></div>
+      </div>
+      <div class="ps-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+      <div class="ps-detail" id="psDetail"></div>
+    </div>
+  </div>
+
+  <button class="btn-calc" onclick="calculate()">スコアを計算する</button>
+  <button class="btn-reset" onclick="resetAll()">リセット</button>
+
+  <p class="note">※ 本ツールは参考値の算出を目的としています。臨床判断は必ず医師が行ってください。<br>TRISS法（Boyd CR et al. 1987）に基づき算出しています。</p>
+</div>
+
+<script>
+const regions = [
+  {id:"head",    name:"頭部・頸部", desc:"脳・頸椎含む"},
+  {id:"face",    name:"顔面",       desc:"眼・鼻・口腔"},
+  {id:"chest",   name:"胸部",       desc:"胸郭・肺・心臓"},
+  {id:"abdomen", name:"腹部・骨盤内",desc:"臓器・骨盤"},
+  {id:"extremity",name:"四肢・骨盤", desc:"四肢・骨盤骨折"},
+  {id:"external",name:"体表",       desc:"皮膚・軟部組織"},
+];
+
+const aisOpts = [
+  {v:0, label:"0 — 損傷なし"},
+  {v:1, label:"1 — 軽傷（Minor）"},
+  {v:2, label:"2 — 中等症（Moderate）"},
+  {v:3, label:"3 — 重症（Serious）"},
+  {v:4, label:"4 — 重篤（Severe）"},
+  {v:5, label:"5 — 最重症（Critical）"},
+  {v:6, label:"6 — 致死的（Unsurvivable）"},
+];
+
+function renderAis() {
+  const c = document.getElementById("aisRows");
+  c.innerHTML = "";
+  regions.forEach((r, i) => {
+    if (i > 0) {
+      const hr = document.createElement("hr");
+      hr.className = "ais-divider";
+      c.appendChild(hr);
+    }
+    const row = document.createElement("div");
+    row.className = "ais-row";
+    row.innerHTML = `
+      <div>
+        <div class="ais-label">${r.name}</div>
+        <div class="ais-desc">${r.desc}</div>
+      </div>
+      <select class="ais-select" id="ais_${r.id}" onchange="updateScore('${r.id}')">
+        ${aisOpts.map(o => `<option value="${o.v}">${o.label}</option>`).join("")}
+      </select>
+      <div class="ais-badge s0" id="score_${r.id}">0</div>
+    `;
+    c.appendChild(row);
+  });
+}
+
+function updateScore(id) {
+  const v = parseInt(document.getElementById("ais_" + id).value);
+  const el = document.getElementById("score_" + id);
+  el.textContent = v;
+  el.className = "ais-badge s" + v;
+}
+
+function getGCS() {
+  const e = parseInt(document.getElementById("gcsE").value);
+  const v = parseInt(document.getElementById("gcsV").value);
+  const m = parseInt(document.getElementById("gcsM").value);
+  return {e, v, m, total: e + v + m};
+}
+
+function updateGcsDisplay() {
+  const g = getGCS();
+  document.getElementById("gcsTotal").textContent = g.total;
+  const el = document.getElementById("gcsLabel");
+  if (g.total <= 8) {
+    el.textContent = "重症（重篤な意識障害）";
+    el.style.color = "#E24B4A";
+  } else if (g.total <= 12) {
+    el.textContent = "中等症";
+    el.style.color = "#BA7517";
+  } else {
+    el.textContent = "正常範囲";
+    el.style.color = "#3B6D11";
+  }
+}
+
+["gcsE","gcsV","gcsM"].forEach(id => {
+  document.getElementById(id).addEventListener("change", updateGcsDisplay);
+});
+
+function gcsCode(t)  { return t>=13?4:t>=9?3:t>=6?2:t>=4?1:0; }
+function sbpCode(s)  { return s>89?4:s>=76?3:s>=50?2:s>=1?1:0; }
+function rrCode(r)   { return (r>=10&&r<=29)?4:(r>=6&&r<=9)?3:(r>=1&&r<=5)?2:r>29?1:0; }
+
+function calculate() {
+  const scores = regions.map(r => ({
+    id: r.id, name: r.name,
+    v: parseInt(document.getElementById("ais_" + r.id).value)
+  }));
+
+  const sorted = [...scores].sort((a,b) => b.v - a.v);
+  const top3 = sorted.slice(0, 3);
+  const iss = top3.reduce((s, x) => s + x.v * x.v, 0);
+
+  const age  = parseInt(document.getElementById("age").value) || 0;
+  const mech = document.getElementById("mechanism").value;
+  const gcs  = getGCS();
+  const sbp  = parseInt(document.getElementById("sbp").value) || 0;
+  const rr   = parseInt(document.getElementById("rr").value)  || 0;
+
+  const gc = gcsCode(gcs.total);
+  const sc = sbpCode(sbp);
+  const rc = rrCode(rr);
+  const rts = 0.9368 * gc + 0.7326 * sc + 0.2908 * rc;
+
+  const ageCoeff = age >= 55 ? -1.1422 : 0;
+  const b0 = mech === "penetrating" ? -1.0286 : -0.4499;
+  const b  = b0 + (0.8085 * rts) - (0.0835 * iss) + ageCoeff;
+  const ps = 1 / (1 + Math.exp(-b));
+
+  document.getElementById("issVal").textContent = iss;
+  document.getElementById("rtsVal").textContent = rts.toFixed(2);
+  document.getElementById("psVal").textContent  = (ps * 100).toFixed(1) + "%";
+
+  const usedNames = top3.filter(x => x.v > 0).map(x => x.name).join("・");
+  document.getElementById("issTop").textContent = usedNames || "損傷なし";
+
+  const formula = top3.map(x => x.v + "²").join(" + ") + " = " + iss;
+  document.getElementById("issFormula").textContent = formula;
+
+  document.getElementById("severityWrap").style.display = "block";
+  document.getElementById("psWrap").style.display = "block";
+
+  const segs   = ["minor","moderate","serious","severe","critical","unsurvivable"];
+  const thresh = [0, 8, 15, 24, 39, 74];
+  let sIdx = 0;
+  for (let i = thresh.length - 1; i >= 0; i--) {
+    if (iss > thresh[i]) { sIdx = i; break; }
+  }
+  if (iss === 75) sIdx = 5;
+
+  const labels = [
+    "軽傷（ISS 1–8）","中等症（ISS 9–15）","重症（ISS 16–24）",
+    "重篤（ISS 25–39）","最重症（ISS 40–74）","致死的（ISS 75）"
+  ];
+  document.getElementById("severityText").textContent = iss === 0 ? "損傷なし" : labels[sIdx];
+
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById("seg" + i);
+    el.className = "severity-seg" + (i <= sIdx && iss > 0 ? " active-" + segs[i] : "");
+  }
+
+  const pct = Math.min(100, Math.max(0, ps * 100));
+  document.getElementById("psDot").style.left = pct + "%";
+
+  const mechLabel = mech === "penetrating" ? "鋭的外傷" : mech === "blunt" ? "鈍的外傷" : "機転未選択";
+  document.getElementById("psDetail").innerHTML =
+    `<span>RTS: ${rts.toFixed(2)}</span><span>${mechLabel} / ${age > 0 ? age + "歳" : "年齢未入力"}</span>`;
+}
+
+function resetAll() {
+  document.getElementById("age").value = "";
+  document.getElementById("mechanism").value = "";
+  document.getElementById("sbp").value = "";
+  document.getElementById("rr").value = "";
+  document.getElementById("hr").value = "";
+  ["gcsE","gcsV","gcsM"].forEach(id => {
+    document.getElementById(id).selectedIndex = 0;
+  });
+  updateGcsDisplay();
+  regions.forEach(r => {
+    document.getElementById("ais_" + r.id).value = 0;
+    updateScore(r.id);
+  });
+  document.getElementById("issVal").textContent = "—";
+  document.getElementById("rtsVal").textContent = "—";
+  document.getElementById("psVal").textContent  = "—";
+  document.getElementById("issTop").textContent = "Injury Severity Score";
+  document.getElementById("issFormula").textContent = "";
+  document.getElementById("severityWrap").style.display = "none";
+  document.getElementById("psWrap").style.display = "none";
+}
+
+renderAis();
+updateGcsDisplay();
+</script>
+</body>
+</html>
