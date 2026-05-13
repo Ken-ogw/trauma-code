@@ -8,18 +8,27 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;background:#f4f5f7;color:#1a1a1a;min-height:100vh;padding:2rem 1rem}
 .container{max-width:720px;margin:0 auto}
-.header{margin-bottom:1.5rem}
-.header h1{font-size:22px;font-weight:600;color:#0f2a4a}
-.header p{font-size:13px;color:#666;margin-top:4px}
+.header{margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-start}
+.header-text h1{font-size:22px;font-weight:600;color:#0f2a4a}
+.header-text p{font-size:13px;color:#666;margin-top:4px}
+.counter-badge{font-size:11px;color:#999;background:#fff;border:1px solid #e0e4ea;border-radius:8px;padding:5px 10px;text-align:center;white-space:nowrap;flex-shrink:0;margin-left:12px;margin-top:2px}
+.counter-badge span{display:block;font-size:18px;font-weight:700;color:#185FA5;line-height:1.2}
 .section{background:#fff;border:1px solid #e0e4ea;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-.section-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px}
+.section-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.75rem}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-@media(max-width:500px){.grid2,.grid3{grid-template-columns:1fr}}
+@media(max-width:500px){.grid2{grid-template-columns:1fr}}
 .field{display:flex;flex-direction:column;gap:4px}
 .field label{font-size:13px;color:#555}
-.field select,.field input[type=number]{font-size:14px;padding:8px 10px;border-radius:8px;border:1px solid #d0d5de;background:#fafbfc;color:#1a1a1a;width:100%;outline:none}
+.field select,.field input[type=number]{font-size:14px;padding:8px 10px;border-radius:8px;border:1px solid #d0d5de;background:#fafbfc;color:#1a1a1a;width:100%;outline:none;transition:border-color 0.15s}
 .field select:focus,.field input:focus{border-color:#185FA5;box-shadow:0 0 0 3px rgba(24,95,165,0.12)}
+.field select.error,.field input.error{border-color:#E24B4A !important;box-shadow:0 0 0 3px rgba(226,75,74,0.12) !important}
+.divider{border:none;border-top:1px solid #eef0f3;margin:0.875rem 0}
+.gcs-row{display:grid;grid-template-columns:1fr 1fr 1fr 80px;gap:10px;align-items:end}
+@media(max-width:500px){.gcs-row{grid-template-columns:1fr 1fr;gap:8px}}
+.gcs-total-box{background:#f4f5f7;border-radius:8px;padding:6px 10px;text-align:center}
+.gcs-total-box .num{font-size:22px;font-weight:700;color:#0f2a4a;line-height:1}
+.gcs-total-box .lbl{font-size:10px;color:#999;margin-top:1px}
+.gcs-label{font-size:12px;font-weight:500;margin-top:6px}
 .ais-row{display:grid;grid-template-columns:150px 1fr 64px;gap:10px;align-items:center;margin-bottom:8px}
 @media(max-width:500px){.ais-row{grid-template-columns:1fr;gap:4px}}
 .ais-label{font-size:13px;font-weight:500;color:#222}
@@ -35,8 +44,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 .ais-select{font-size:13px;padding:6px 8px;border-radius:8px;border:1px solid #d0d5de;background:#fafbfc;color:#1a1a1a;width:100%;outline:none}
 .ais-select:focus{border-color:#185FA5;box-shadow:0 0 0 3px rgba(24,95,165,0.12)}
 .ais-divider{border:none;border-top:1px solid #eef0f3;margin:8px 0}
-.results{background:#0f2a4a;border-radius:12px;padding:1.25rem;margin-bottom:1rem;color:#fff}
+.alert{display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:0.875rem 1rem;margin-bottom:1rem}
+.alert.show{display:block}
+.alert-title{font-size:13px;font-weight:600;color:#991B1B;margin-bottom:4px}
+.alert ul{font-size:12px;color:#B91C1C;padding-left:1.25rem;line-height:1.9}
+.results{background:#0f2a4a;border-radius:12px;padding:1.25rem;margin-top:1rem;margin-bottom:1rem;color:#fff;display:none}
 .result-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0.75rem}
+@media(max-width:500px){.result-cards{grid-template-columns:1fr}}
+.result-card{background:rgba(255,255,255,0.08);border-radius:10px;padding:0.875rem 1rem;text-align:center}
+.result-card .val{font-size:30px;font-weight:700;line-height:1.1;color:#7ec8ff}
+.result-card .lbl{font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px}
+.result-card .sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:4px;min-height:14px}
+.result-card .formula{font-size:10px;color:rgba(255,255,255,0.35);margin-top:3px;font-style:italic}
 .triss-detail{background:rgba(255,255,255,0.05);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.75rem;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.9;display:none}
 .triss-detail .triss-row{display:flex;justify-content:space-between;align-items:baseline}
 .triss-detail .triss-row .k{color:rgba(255,255,255,0.4)}
@@ -44,12 +63,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 .triss-detail .triss-total{border-top:1px solid rgba(255,255,255,0.1);margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;align-items:baseline}
 .triss-detail .triss-total .k{color:rgba(255,255,255,0.5);font-weight:600}
 .triss-detail .triss-total .v{color:#7ec8ff;font-family:monospace;font-size:15px;font-weight:700}
-@media(max-width:500px){.result-cards{grid-template-columns:1fr}}
-.result-card{background:rgba(255,255,255,0.08);border-radius:10px;padding:0.875rem 1rem;text-align:center}
-.result-card .val{font-size:30px;font-weight:700;line-height:1.1;color:#7ec8ff}
-.result-card .lbl{font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px}
-.result-card .sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:4px;min-height:14px}
-.result-card .formula{font-size:10px;color:rgba(255,255,255,0.35);margin-top:3px;font-style:italic}
 .severity-wrap{margin-top:0.875rem}
 .severity-title{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:5px}
 .severity-bar{display:flex;gap:3px}
@@ -67,10 +80,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 .ps-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #0f2a4a;box-shadow:0 0 0 2px #fff;transition:left 0.4s;pointer-events:none}
 .ps-labels{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px}
 .ps-detail{font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;display:flex;justify-content:space-between}
-.gcs-total{display:flex;align-items:baseline;gap:8px;margin-top:8px}
-.gcs-total .num{font-size:24px;font-weight:700;color:#0f2a4a}
-.gcs-total .denom{font-size:13px;color:#999}
-.gcs-total .label{font-size:12px;margin-left:4px;font-weight:500}
 .btn-calc{width:100%;padding:12px;font-size:15px;font-weight:600;border-radius:10px;border:none;background:#185FA5;color:#fff;cursor:pointer;transition:background 0.2s,transform 0.1s;letter-spacing:0.02em}
 .btn-calc:hover{background:#0C447C}
 .btn-calc:active{transform:scale(0.99)}
@@ -95,11 +104,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 </head>
 <body>
 <div class="container">
+
   <div class="header">
-    <h1>外傷スコア計算</h1>
-    <p>AISスコアからISS・RTS・Ps（生存確率）を算出します</p>
+    <div class="header-text">
+      <h1>外傷スコア計算</h1>
+      <p>AISスコアからISS・RTS・Ps（生存確率）を算出します</p>
+    </div>
+    <div class="counter-badge">
+      <span id="counterVal">…</span>
+      アクセス数
+    </div>
   </div>
 
+  <!-- 患者基本情報 -->
   <div class="section">
     <div class="section-title">👤 患者基本情報</div>
     <div class="grid2">
@@ -118,9 +135,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
     </div>
   </div>
 
+  <!-- バイタルサイン + GCS -->
   <div class="section">
-    <div class="section-title">🧠 グラスゴー昏睡尺度（GCS）</div>
-    <div class="grid3">
+    <div class="section-title">❤️ バイタルサイン</div>
+    <div class="grid2">
+      <div class="field">
+        <label>収縮期血圧（mmHg）</label>
+        <input type="number" id="sbp" min="0" max="300" placeholder="例：120">
+      </div>
+      <div class="field">
+        <label>呼吸数（/分）</label>
+        <input type="number" id="rr" min="0" max="60" placeholder="例：16">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-title" style="margin-bottom:0.5rem">🧠 GCS（グラスゴー昏睡尺度）</div>
+    <div class="gcs-row">
       <div class="field">
         <label>開眼（E）</label>
         <select id="gcsE">
@@ -151,37 +183,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
           <option value="1">1 — なし</option>
         </select>
       </div>
-    </div>
-    <div class="gcs-total">
-      <span class="num" id="gcsTotal">15</span>
-      <span class="denom">/ 15</span>
-      <span class="label" id="gcsLabel" style="color:#3B6D11">正常範囲</span>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">❤️ バイタルサイン</div>
-    <div class="grid2">
-      <div class="field">
-        <label>収縮期血圧（mmHg）</label>
-        <input type="number" id="sbp" min="0" max="300" placeholder="例：120">
-      </div>
-      <div class="field">
-        <label>呼吸数（/分）</label>
-        <input type="number" id="rr" min="0" max="60" placeholder="例：16">
+      <div class="gcs-total-box">
+        <div class="num" id="gcsTotal">15</div>
+        <div class="lbl">GCS合計</div>
       </div>
     </div>
+    <div class="gcs-label" id="gcsLabel" style="color:#3B6D11">正常範囲</div>
   </div>
 
+  <!-- AISスコア -->
   <div class="section">
     <div class="section-title">🫁 AISスコア（各部位）</div>
     <div id="aisRows"></div>
   </div>
 
+  <!-- 計算式説明 -->
   <details class="formula-section">
     <summary>📐 各スコアの計算式を見る</summary>
     <div class="formula-body">
-
       <div class="formula-block">
         <div class="formula-title">AIS（Abbreviated Injury Scale）</div>
         <div class="formula-desc">各部位の損傷を0〜6で評価する重症度スケール。</div>
@@ -196,10 +215,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
           <tr><td>6</td><td>致死的</td><td>Unsurvivable</td></tr>
         </table>
       </div>
-
       <div class="formula-block">
         <div class="formula-title">ISS（Injury Severity Score）</div>
-        <div class="formula-desc">6部位のAISスコアのうち、上位3部位の二乗和。最大値は75（3部位すべてAIS=5の場合）。AIS=6がひとつでもあれば自動的にISS=75。</div>
+        <div class="formula-desc">6部位のAISスコアのうち、上位3部位の二乗和。AIS=6がひとつでもあれば自動的にISS=75。</div>
         <div class="formula-eq">ISS = AIS₁² + AIS₂² + AIS₃²</div>
         <table class="formula-table">
           <tr><th>ISS</th><th>重症度分類</th></tr>
@@ -211,10 +229,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
           <tr><td>75</td><td>致死的（Unsurvivable）</td></tr>
         </table>
       </div>
-
       <div class="formula-block">
         <div class="formula-title">RTS（Revised Trauma Score）</div>
-        <div class="formula-desc">GCS・収縮期血圧・呼吸数をコード化して重み付け加算。最大値は7.84（すべて正常）。</div>
+        <div class="formula-desc">GCS・収縮期血圧・呼吸数をコード化して重み付け加算。最大値は7.84。</div>
         <div class="formula-eq">RTS = 0.9368×GCS<sub>code</sub> + 0.7326×SBP<sub>code</sub> + 0.2908×RR<sub>code</sub></div>
         <table class="formula-table">
           <tr><th>コード</th><th>GCS</th><th>SBP (mmHg)</th><th>RR (/分)</th></tr>
@@ -225,12 +242,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
           <tr><td>0</td><td>3</td><td>0</td><td>0</td></tr>
         </table>
       </div>
-
       <div class="formula-block">
         <div class="formula-title">Ps（TRISS法・生存確率）</div>
-        <div class="formula-desc">RTS・ISS・年齢・受傷機転からロジスティック回帰で生存確率を算出。係数はBoyd CR et al. 1987に基づく。</div>
+        <div class="formula-desc">RTS・ISS・年齢・受傷機転からロジスティック回帰で生存確率を算出。Boyd CR et al. 1987に基づく。</div>
         <div class="formula-eq">Ps = 1 / (1 + e<sup>−b</sup>)</div>
-        <div class="formula-eq">b = b₀ + 0.8085×RTS − 0.0835×ISS + 年齢補正</div>
+        <div class="formula-eq">b = b₀ + RTS係数×RTS + ISS係数×ISS + 年齢補正</div>
         <table class="formula-table">
           <tr><th>係数</th><th>鈍的外傷</th><th>鋭的外傷</th></tr>
           <tr><td>b₀（切片）</td><td>−0.4499</td><td>−2.5355</td></tr>
@@ -239,14 +255,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
           <tr><td>年齢補正（≥55歳）</td><td colspan="2">−1.1422</td></tr>
         </table>
       </div>
-
     </div>
   </details>
+
+  <!-- バリデーションアラート -->
+  <div class="alert" id="alertBox">
+    <div class="alert-title">⚠️ 未入力の項目があります</div>
+    <ul id="alertList"></ul>
+  </div>
 
   <button class="btn-calc" onclick="calculate()">スコアを計算する</button>
   <button class="btn-reset" onclick="resetAll()">リセット</button>
 
-  <div class="results" id="results" style="margin-top:1rem">
+  <!-- 計算結果 -->
+  <div class="results" id="results">
     <div class="result-cards">
       <div class="result-card">
         <div class="val" id="issVal">—</div>
@@ -262,14 +284,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
       <div class="result-card">
         <div class="val" id="psVal">—</div>
         <div class="lbl">Ps（生存確率）</div>
-        <div class="sub" id="psLabel">TRISS法</div>
+        <div class="sub">TRISS法</div>
       </div>
     </div>
 
     <div class="triss-detail" id="trissDetail">
       <div class="triss-row"><span class="k">b₀（切片：受傷機転）</span><span class="v" id="td_b0">—</span></div>
-      <div class="triss-row"><span class="k">0.8085 × RTS</span><span class="v" id="td_rts">—</span></div>
-      <div class="triss-row"><span class="k">−0.0835 × ISS</span><span class="v" id="td_iss">—</span></div>
+      <div class="triss-row"><span class="k">RTS項</span><span class="v" id="td_rts">—</span></div>
+      <div class="triss-row"><span class="k">ISS項</span><span class="v" id="td_iss">—</span></div>
       <div class="triss-row"><span class="k">年齢補正（≥55歳: −1.1422）</span><span class="v" id="td_age">—</span></div>
       <div class="triss-total"><span class="k">b 値合計</span><span class="v" id="td_b">—</span></div>
     </div>
@@ -301,13 +323,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 </div>
 
 <script>
+// ─── アクセスカウンター ───
+(function(){
+  try {
+    const key = "trauma_access_count";
+    const n = parseInt(localStorage.getItem(key) || "0") + 1;
+    localStorage.setItem(key, n);
+    document.getElementById("counterVal").textContent = n.toLocaleString();
+  } catch(e) {
+    document.getElementById("counterVal").textContent = "—";
+  }
+})();
+
+// ─── データ定義 ───
 const regions = [
-  {id:"head",    name:"頭部・頸部", desc:"脳・頸椎含む"},
-  {id:"face",    name:"顔面",       desc:"眼・鼻・口腔"},
-  {id:"chest",   name:"胸部",       desc:"胸郭・肺・心臓"},
-  {id:"abdomen", name:"腹部・骨盤内",desc:"腹部臓器"},
-  {id:"extremity",name:"四肢・骨盤", desc:"四肢・骨盤骨折"},
-  {id:"external",name:"体表",       desc:"皮膚・軟部組織"},
+  {id:"head",     name:"頭部・頸部",   desc:"脳・頸椎含む"},
+  {id:"face",     name:"顔面",         desc:"眼・鼻・口腔"},
+  {id:"chest",    name:"胸部",         desc:"胸郭・肺・心臓"},
+  {id:"abdomen",  name:"腹部・骨盤内", desc:"腹部臓器"},
+  {id:"extremity",name:"四肢・骨盤",   desc:"四肢・骨盤骨折"},
+  {id:"external", name:"体表",         desc:"皮膚・軟部組織"},
 ];
 
 const aisOpts = [
@@ -320,6 +355,7 @@ const aisOpts = [
   {v:6, label:"6 — 致死的（Unsurvivable）"},
 ];
 
+// ─── AIS行の描画 ───
 function renderAis() {
   const c = document.getElementById("aisRows");
   c.innerHTML = "";
@@ -352,6 +388,7 @@ function updateScore(id) {
   el.className = "ais-badge s" + v;
 }
 
+// ─── GCS ───
 function getGCS() {
   const e = parseInt(document.getElementById("gcsE").value);
   const v = parseInt(document.getElementById("gcsV").value);
@@ -379,11 +416,50 @@ function updateGcsDisplay() {
   document.getElementById(id).addEventListener("change", updateGcsDisplay);
 });
 
-function gcsCode(t)  { return t>=13?4:t>=9?3:t>=6?2:t>=4?1:0; }
-function sbpCode(s)  { return s>89?4:s>=76?3:s>=50?2:s>=1?1:0; }
-function rrCode(r)   { return (r>=10&&r<=29)?4:(r>=6&&r<=9)?3:(r>=1&&r<=5)?2:r>29?1:0; }
+// ─── RTSコード変換 ───
+function gcsCode(t) { return t>=13?4:t>=9?3:t>=6?2:t>=4?1:0; }
+function sbpCode(s) { return s>89?4:s>=76?3:s>=50?2:s>=1?1:0; }
+function rrCode(r)  { return (r>=10&&r<=29)?4:(r>=6&&r<=9)?3:(r>=1&&r<=5)?2:r>29?1:0; }
 
+// ─── バリデーション ───
+function validate() {
+  const fields = [
+    {id:"age",       label:"年齢"},
+    {id:"mechanism", label:"受傷機転"},
+    {id:"sbp",       label:"収縮期血圧"},
+    {id:"rr",        label:"呼吸数"},
+  ];
+
+  const errors = [];
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    el.classList.remove("error");
+    const empty = (el.tagName === "SELECT")
+      ? el.value === ""
+      : el.value === "";
+    if (empty) {
+      errors.push(f.label);
+      el.classList.add("error");
+    }
+  });
+
+  const alertBox  = document.getElementById("alertBox");
+  const alertList = document.getElementById("alertList");
+
+  if (errors.length > 0) {
+    alertList.innerHTML = errors.map(e => `<li>${e} が未入力です</li>`).join("");
+    alertBox.classList.add("show");
+    alertBox.scrollIntoView({behavior:"smooth", block:"center"});
+    return false;
+  }
+  alertBox.classList.remove("show");
+  return true;
+}
+
+// ─── 計算 ───
 function calculate() {
+  if (!validate()) return;
+
   const scores = regions.map(r => ({
     id: r.id, name: r.name,
     v: parseInt(document.getElementById("ais_" + r.id).value)
@@ -394,11 +470,11 @@ function calculate() {
   const hasAis6 = scores.some(x => x.v === 6);
   const iss = hasAis6 ? 75 : top3.reduce((s, x) => s + x.v * x.v, 0);
 
-  const age  = parseInt(document.getElementById("age").value) || 0;
+  const age  = parseInt(document.getElementById("age").value);
   const mech = document.getElementById("mechanism").value;
   const gcs  = getGCS();
-  const sbp  = parseInt(document.getElementById("sbp").value) || 0;
-  const rr   = parseInt(document.getElementById("rr").value)  || 0;
+  const sbp  = parseInt(document.getElementById("sbp").value);
+  const rr   = parseInt(document.getElementById("rr").value);
 
   const gc = gcsCode(gcs.total);
   const sc = sbpCode(sbp);
@@ -406,12 +482,15 @@ function calculate() {
   const rts = 0.9368 * gc + 0.7326 * sc + 0.2908 * rc;
 
   const ageCoeff = age >= 55 ? -1.1422 : 0;
-  const b0      = mech === "penetrating" ? -2.5355 : -0.4499;
-  const rtsCoef = mech === "penetrating" ?  0.9934 :  0.8085;
-  const issCoef = mech === "penetrating" ? -0.0651 : -0.0835;
+  const b0       = mech === "penetrating" ? -2.5355 : -0.4499;
+  const rtsCoef  = mech === "penetrating" ?  0.9934 :  0.8085;
+  const issCoef  = mech === "penetrating" ? -0.0651 : -0.0835;
   const b  = b0 + (rtsCoef * rts) + (issCoef * iss) + ageCoeff;
   const ps = 1 / (1 + Math.exp(-b));
 
+  // 結果表示
+  const resultsEl = document.getElementById("results");
+  resultsEl.style.display = "block";
   document.getElementById("issVal").textContent = iss;
   document.getElementById("rtsVal").textContent = rts.toFixed(2);
   document.getElementById("psVal").textContent  = (ps * 100).toFixed(1) + "%";
@@ -424,9 +503,7 @@ function calculate() {
     : top3.map(x => x.v + "²").join(" + ") + " = " + iss;
   document.getElementById("issFormula").textContent = formula;
 
-  document.getElementById("severityWrap").style.display = "block";
-  document.getElementById("psWrap").style.display = "block";
-
+  // TRISS内訳
   const rtsComponent = rtsCoef * rts;
   const issComponent = issCoef * iss;
   document.getElementById("trissDetail").style.display = "block";
@@ -436,6 +513,8 @@ function calculate() {
   document.getElementById("td_age").textContent = ageCoeff !== 0 ? ageCoeff.toFixed(4) : "0（<55歳）";
   document.getElementById("td_b").textContent   = b.toFixed(4);
 
+  // 重症度バー
+  document.getElementById("severityWrap").style.display = "block";
   const segs   = ["minor","moderate","serious","severe","critical","unsurvivable"];
   const thresh = [0, 8, 15, 24, 39, 74];
   let sIdx = 0;
@@ -443,26 +522,29 @@ function calculate() {
     if (iss > thresh[i]) { sIdx = i; break; }
   }
   if (iss === 75) sIdx = 5;
-
   const labels = [
     "軽傷（ISS 1–8）","中等症（ISS 9–15）","重症（ISS 16–24）",
     "重篤（ISS 25–39）","最重症（ISS 40–74）","致死的（ISS 75）"
   ];
   document.getElementById("severityText").textContent = iss === 0 ? "損傷なし" : labels[sIdx];
-
   for (let i = 0; i < 6; i++) {
-    const el = document.getElementById("seg" + i);
-    el.className = "severity-seg" + (i <= sIdx && iss > 0 ? " active-" + segs[i] : "");
+    document.getElementById("seg" + i).className =
+      "severity-seg" + (i <= sIdx && iss > 0 ? " active-" + segs[i] : "");
   }
 
+  // 生存確率インジケーター
+  document.getElementById("psWrap").style.display = "block";
   const pct = Math.min(100, Math.max(0, ps * 100));
   document.getElementById("psDot").style.left = pct + "%";
-
-  const mechLabel = mech === "penetrating" ? "鋭的外傷" : mech === "blunt" ? "鈍的外傷" : "機転未選択";
+  const mechLabel = mech === "penetrating" ? "鋭的外傷" : "鈍的外傷";
   document.getElementById("psDetail").innerHTML =
-    `<span>Ps = 1/(1+e<sup>−b</sup>)</span><span>${mechLabel} / ${age > 0 ? age + "歳" : "年齢未入力"}</span>`;
+    `<span>Ps = 1/(1+e<sup>−b</sup>)</span><span>${mechLabel} / ${age}歳</span>`;
+
+  // 結果へスクロール
+  resultsEl.scrollIntoView({behavior:"smooth", block:"start"});
 }
 
+// ─── リセット ───
 function resetAll() {
   document.getElementById("age").value = "";
   document.getElementById("mechanism").value = "";
@@ -476,14 +558,14 @@ function resetAll() {
     document.getElementById("ais_" + r.id).value = 0;
     updateScore(r.id);
   });
-  document.getElementById("issVal").textContent = "—";
-  document.getElementById("rtsVal").textContent = "—";
-  document.getElementById("psVal").textContent  = "—";
-  document.getElementById("issTop").textContent = "Injury Severity Score";
-  document.getElementById("issFormula").textContent = "";
+  ["age","mechanism","sbp","rr"].forEach(id => {
+    document.getElementById(id).classList.remove("error");
+  });
+  document.getElementById("alertBox").classList.remove("show");
+  document.getElementById("results").style.display = "none";
+  document.getElementById("trissDetail").style.display = "none";
   document.getElementById("severityWrap").style.display = "none";
   document.getElementById("psWrap").style.display = "none";
-  document.getElementById("trissDetail").style.display = "none";
 }
 
 renderAis();
