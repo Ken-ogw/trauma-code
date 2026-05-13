@@ -158,41 +158,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
     <div class="section-title" style="margin-bottom:0.5rem">🧠 GCS（グラスゴー昏睡尺度）</div>
     <div class="gcs-row">
       <div class="field">
-        <label>開眼（E）</label>
-        <select id="gcsE">
-          <option value="4">4 — 自発的</option>
-          <option value="3">3 — 呼びかけ</option>
-          <option value="2">2 — 疼痛</option>
-          <option value="1">1 — なし</option>
-        </select>
+        <label>開眼（E）<span style="font-size:11px;color:#bbb">1–4</span></label>
+        <input type="number" id="gcsE" min="1" max="4" placeholder="1〜4" oninput="updateGcsDisplay()">
       </div>
       <div class="field">
-        <label>言語（V）</label>
-        <select id="gcsV">
-          <option value="5">5 — 見当識あり</option>
-          <option value="4">4 — 混乱</option>
-          <option value="3">3 — 異常言語</option>
-          <option value="2">2 — 理解不能</option>
-          <option value="1">1 — なし</option>
-        </select>
+        <label>言語（V）<span style="font-size:11px;color:#bbb">1–5</span></label>
+        <input type="number" id="gcsV" min="1" max="5" placeholder="1〜5" oninput="updateGcsDisplay()">
       </div>
       <div class="field">
-        <label>運動（M）</label>
-        <select id="gcsM">
-          <option value="6">6 — 命令に従う</option>
-          <option value="5">5 — 疼痛局在</option>
-          <option value="4">4 — 逃避（屈曲）</option>
-          <option value="3">3 — 異常屈曲</option>
-          <option value="2">2 — 伸展</option>
-          <option value="1">1 — なし</option>
-        </select>
+        <label>運動（M）<span style="font-size:11px;color:#bbb">1–6</span></label>
+        <input type="number" id="gcsM" min="1" max="6" placeholder="1〜6" oninput="updateGcsDisplay()">
       </div>
       <div class="gcs-total-box">
-        <div class="num" id="gcsTotal">15</div>
+        <div class="num" id="gcsTotal">—</div>
         <div class="lbl">GCS合計</div>
       </div>
     </div>
-    <div class="gcs-label" id="gcsLabel" style="color:#3B6D11">正常範囲</div>
+    <div class="gcs-label" id="gcsLabel"></div>
   </div>
 
   <!-- AISスコア -->
@@ -415,31 +397,35 @@ function updateScore(id) {
 
 // ─── GCS ───
 function getGCS() {
-  const e = parseInt(document.getElementById("gcsE").value);
-  const v = parseInt(document.getElementById("gcsV").value);
-  const m = parseInt(document.getElementById("gcsM").value);
+  const e = parseInt(document.getElementById("gcsE").value) || 0;
+  const v = parseInt(document.getElementById("gcsV").value) || 0;
+  const m = parseInt(document.getElementById("gcsM").value) || 0;
   return {e, v, m, total: e + v + m};
 }
 
 function updateGcsDisplay() {
   const g = getGCS();
-  document.getElementById("gcsTotal").textContent = g.total;
-  const el = document.getElementById("gcsLabel");
-  if (g.total <= 8) {
-    el.textContent = "重症（重篤な意識障害）";
-    el.style.color = "#E24B4A";
-  } else if (g.total <= 12) {
-    el.textContent = "中等症";
-    el.style.color = "#BA7517";
+  const total = g.total;
+  const el = document.getElementById("gcsTotal");
+  const lbl = document.getElementById("gcsLabel");
+  if (total === 0) {
+    el.textContent = "—";
+    lbl.textContent = "";
+    lbl.style.color = "";
   } else {
-    el.textContent = "正常範囲";
-    el.style.color = "#3B6D11";
+    el.textContent = total;
+    if (total <= 8) {
+      lbl.textContent = "重症（重篤な意識障害）";
+      lbl.style.color = "#E24B4A";
+    } else if (total <= 12) {
+      lbl.textContent = "中等症";
+      lbl.style.color = "#BA7517";
+    } else {
+      lbl.textContent = "正常範囲";
+      lbl.style.color = "#3B6D11";
+    }
   }
 }
-
-["gcsE","gcsV","gcsM"].forEach(id => {
-  document.getElementById(id).addEventListener("change", updateGcsDisplay);
-});
 
 // ─── RTSコード変換 ───
 function gcsCode(t) { return t>=13?4:t>=9?3:t>=6?2:t>=4?1:0; }
@@ -597,9 +583,9 @@ function resetAll() {
   document.getElementById("mechanism").value = "";
   document.getElementById("sbp").value = "";
   document.getElementById("rr").value = "";
-  ["gcsE","gcsV","gcsM"].forEach(id => {
-    document.getElementById(id).selectedIndex = 0;
-  });
+  document.getElementById("gcsE").value = "";
+  document.getElementById("gcsV").value = "";
+  document.getElementById("gcsM").value = "";
   updateGcsDisplay();
   regions.forEach(r => {
     document.getElementById("ais_" + r.id).value = 0;
@@ -620,7 +606,6 @@ function resetAll() {
 }
 
 renderAis();
-updateGcsDisplay();
 </script>
 </body>
 </html>
