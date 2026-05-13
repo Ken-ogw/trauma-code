@@ -391,7 +391,8 @@ function calculate() {
 
   const sorted = [...scores].sort((a,b) => b.v - a.v);
   const top3 = sorted.slice(0, 3);
-  const iss = top3.reduce((s, x) => s + x.v * x.v, 0);
+  const hasAis6 = scores.some(x => x.v === 6);
+  const iss = hasAis6 ? 75 : top3.reduce((s, x) => s + x.v * x.v, 0);
 
   const age  = parseInt(document.getElementById("age").value) || 0;
   const mech = document.getElementById("mechanism").value;
@@ -418,7 +419,9 @@ function calculate() {
   const usedNames = top3.filter(x => x.v > 0).map(x => x.name).join("・");
   document.getElementById("issTop").textContent = usedNames || "損傷なし";
 
-  const formula = top3.map(x => x.v + "²").join(" + ") + " = " + iss;
+  const formula = hasAis6
+    ? "AIS=6のため自動的にISS=75"
+    : top3.map(x => x.v + "²").join(" + ") + " = " + iss;
   document.getElementById("issFormula").textContent = formula;
 
   document.getElementById("severityWrap").style.display = "block";
