@@ -275,7 +275,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
     <div class="ps-compare">
       <!-- Boyd 1987 -->
       <div class="ps-col">
-        <div class="ps-col-title">TRISS<span class="ps-col-sub">Boyd et al. 1987（MTOS）</span></div>
+        <div class="ps-col-title">Ps（生存確率）<span class="ps-col-sub">TRISS法 / Boyd et al. 1987（MTOS）</span></div>
         <div class="ps-col-val" id="psBoyd">—</div>
         <div class="ps-col-note" id="psBoydNote"></div>
         <div class="triss-detail" id="trissDetailBoyd">
@@ -293,7 +293,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 
       <!-- Schluter 2010 -->
       <div class="ps-col">
-        <div class="ps-col-title">TRISS 2009改訂版<span class="ps-col-sub">Schluter et al. 2010（NTDB imputed）</span></div>
+        <div class="ps-col-title">Ps（生存確率）<span class="ps-col-sub">TRISS 2009年改訂版 / Schluter et al. 2010（NTDB imputed）</span></div>
         <div class="ps-col-val" id="psSchluter">—</div>
         <div class="ps-col-note" id="psSchluterNote"></div>
         <div class="triss-detail" id="trissDetailSchluter">
@@ -307,7 +307,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
           <div class="ps-track"><div class="ps-dot" id="psDotSchluter" style="left:50%"></div></div>
           <div class="ps-labels"><span>0%</span><span>50%</span><span>100%</span></div>
         </div>
-        <div class="jtdb-note">※ 2026年現在、JTDBで使用されている係数と考えられます（未確認）</div>
+        <div class="jtdb-note">※ 2026年現在、JTDBで使用されている係数と考えられます</div>
       </div>
     </div>
 
@@ -445,11 +445,27 @@ function validate() {
   fields.forEach(f => {
     const el = document.getElementById(f.id);
     el.classList.remove("error");
-    const empty = (el.tagName === "SELECT")
-      ? el.value === ""
-      : el.value === "";
-    if (empty) {
-      errors.push(f.label);
+    if (el.value === "") {
+      errors.push(f.label + " が未入力です");
+      el.classList.add("error");
+    }
+  });
+
+  // GCS範囲チェック
+  const gcsRules = [
+    {id:"gcsE", label:"開眼（E）", min:1, max:4},
+    {id:"gcsV", label:"言語（V）", min:1, max:5},
+    {id:"gcsM", label:"運動（M）", min:1, max:6},
+  ];
+  gcsRules.forEach(g => {
+    const el = document.getElementById(g.id);
+    el.classList.remove("error");
+    const v = parseInt(el.value);
+    if (el.value === "") {
+      errors.push("GCS " + g.label + " が未入力です");
+      el.classList.add("error");
+    } else if (isNaN(v) || v < g.min || v > g.max) {
+      errors.push("GCS " + g.label + " は " + g.min + "〜" + g.max + " の範囲で入力してください");
       el.classList.add("error");
     }
   });
@@ -458,7 +474,7 @@ function validate() {
   const alertList = document.getElementById("alertList");
 
   if (errors.length > 0) {
-    alertList.innerHTML = errors.map(e => `<li>${e} が未入力です</li>`).join("");
+    alertList.innerHTML = errors.map(e => `<li>${e}</li>`).join("");
     alertBox.classList.add("show");
     alertBox.scrollIntoView({behavior:"smooth", block:"center"});
     return false;
@@ -591,7 +607,7 @@ function resetAll() {
     document.getElementById("ais_" + r.id).value = 0;
     updateScore(r.id);
   });
-  ["age","mechanism","sbp","rr"].forEach(id => {
+  ["age","mechanism","sbp","rr","gcsE","gcsV","gcsM"].forEach(id => {
     document.getElementById(id).classList.remove("error");
   });
   document.getElementById("alertBox").classList.remove("show");
