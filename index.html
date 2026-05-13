@@ -72,12 +72,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 .severity-seg.active-critical{background:#A32D2D}
 .severity-seg.active-unsurvivable{background:#501313}
 .severity-label{font-size:12px;color:rgba(255,255,255,0.7);margin-top:6px;font-weight:500}
-.ps-wrap{margin-top:0.875rem}
-.ps-title{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:5px}
-.ps-track{height:10px;border-radius:5px;background:linear-gradient(90deg,#E24B4A 0%,#EF9F27 40%,#639922 80%,#27500A 100%);position:relative}
-.ps-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #0f2a4a;box-shadow:0 0 0 2px #fff;transition:left 0.4s;pointer-events:none}
-.ps-labels{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px}
-.ps-detail{font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;display:flex;justify-content:space-between}
+.ps-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0.75rem}
+@media(max-width:500px){.ps-compare{grid-template-columns:1fr}}
+.jtdb-note{font-size:10px;color:rgba(255,255,255,0.25);margin-top:8px;line-height:1.5;font-style:italic}
+.ps-col{background:rgba(255,255,255,0.06);border-radius:10px;padding:0.875rem}
+.ps-col-title{font-size:12px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:2px}
+.ps-col-sub{display:block;font-size:10px;color:rgba(255,255,255,0.35);font-weight:400;margin-bottom:6px}
+.ps-col-val{font-size:32px;font-weight:700;color:#7ec8ff;line-height:1.1;margin-bottom:2px}
+.ps-col-note{font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;min-height:14px}
+.ps-col.unavailable .ps-col-val{color:rgba(255,255,255,0.25);font-size:20px}
+.ps-bar-wrap{margin-top:8px}
+.ps-track{height:8px;border-radius:4px;background:linear-gradient(90deg,#E24B4A 0%,#EF9F27 40%,#639922 80%,#27500A 100%);position:relative}
+.ps-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid #0f2a4a;box-shadow:0 0 0 2px #fff;transition:left 0.4s;pointer-events:none}
+.ps-labels{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.3);margin-top:3px}
 .btn-calc{width:100%;padding:12px;font-size:15px;font-weight:600;border-radius:10px;border:none;background:#185FA5;color:#fff;cursor:pointer;transition:background 0.2s,transform 0.1s;letter-spacing:0.02em}
 .btn-calc:hover{background:#0C447C}
 .btn-calc:active{transform:scale(0.99)}
@@ -266,6 +273,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 
   <!-- 計算結果 -->
   <div class="results" id="results">
+
+    <!-- ISS / RTS 共通 -->
     <div class="result-cards">
       <div class="result-card">
         <div class="val" id="issVal">—</div>
@@ -278,21 +287,49 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
         <div class="lbl">RTS</div>
         <div class="sub">Revised Trauma Score</div>
       </div>
-      <div class="result-card">
-        <div class="val" id="psVal">—</div>
-        <div class="lbl">Ps（生存確率）</div>
-        <div class="sub">TRISS法</div>
+    </div>
+
+    <!-- 生存確率 2列 -->
+    <div class="ps-compare">
+      <!-- Boyd 1987 -->
+      <div class="ps-col">
+        <div class="ps-col-title">TRISS<span class="ps-col-sub">Boyd et al. 1987（MTOS）</span></div>
+        <div class="ps-col-val" id="psBoyd">—</div>
+        <div class="ps-col-note" id="psBoydNote"></div>
+        <div class="triss-detail" id="trissDetailBoyd">
+          <div class="triss-row"><span class="k">b₀</span><span class="v" id="tb_b0">—</span></div>
+          <div class="triss-row"><span class="k">RTS項</span><span class="v" id="tb_rts">—</span></div>
+          <div class="triss-row"><span class="k">ISS項</span><span class="v" id="tb_iss">—</span></div>
+          <div class="triss-row"><span class="k">年齢補正</span><span class="v" id="tb_age">—</span></div>
+          <div class="triss-total"><span class="k">b値</span><span class="v" id="tb_b">—</span></div>
+        </div>
+        <div class="ps-bar-wrap">
+          <div class="ps-track"><div class="ps-dot" id="psDotBoyd" style="left:50%"></div></div>
+          <div class="ps-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+        </div>
+      </div>
+
+      <!-- Schluter 2010 -->
+      <div class="ps-col">
+        <div class="ps-col-title">TRISS 2009改訂版<span class="ps-col-sub">Schluter et al. 2010（NTDB imputed）</span></div>
+        <div class="ps-col-val" id="psSchluter">—</div>
+        <div class="ps-col-note" id="psSchluterNote"></div>
+        <div class="triss-detail" id="trissDetailSchluter">
+          <div class="triss-row"><span class="k">b₀</span><span class="v" id="ts_b0">—</span></div>
+          <div class="triss-row"><span class="k">RTS項</span><span class="v" id="ts_rts">—</span></div>
+          <div class="triss-row"><span class="k">ISS項</span><span class="v" id="ts_iss">—</span></div>
+          <div class="triss-row"><span class="k">年齢補正</span><span class="v" id="ts_age">—</span></div>
+          <div class="triss-total"><span class="k">b値</span><span class="v" id="ts_b">—</span></div>
+        </div>
+        <div class="ps-bar-wrap">
+          <div class="ps-track"><div class="ps-dot" id="psDotSchluter" style="left:50%"></div></div>
+          <div class="ps-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+        </div>
+        <div class="jtdb-note">※ 2026年現在、JTDBで使用されている係数と考えられます（未確認）</div>
       </div>
     </div>
 
-    <div class="triss-detail" id="trissDetail">
-      <div class="triss-row"><span class="k">b₀（切片：受傷機転）</span><span class="v" id="td_b0">—</span></div>
-      <div class="triss-row"><span class="k">RTS項</span><span class="v" id="td_rts">—</span></div>
-      <div class="triss-row"><span class="k">ISS項</span><span class="v" id="td_iss">—</span></div>
-      <div class="triss-row"><span class="k">年齢補正（≥55歳: −1.1422）</span><span class="v" id="td_age">—</span></div>
-      <div class="triss-total"><span class="k">b 値合計</span><span class="v" id="td_b">—</span></div>
-    </div>
-
+    <!-- 重症度バー -->
     <div class="severity-wrap" id="severityWrap" style="display:none">
       <div class="severity-title">ISS 重症度分類</div>
       <div class="severity-bar">
@@ -306,14 +343,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
       <div class="severity-label" id="severityText"></div>
     </div>
 
-    <div class="ps-wrap" id="psWrap" style="display:none">
-      <div class="ps-title">生存確率インジケーター</div>
-      <div class="ps-track">
-        <div class="ps-dot" id="psDot" style="left:50%"></div>
-      </div>
-      <div class="ps-labels"><span>0%</span><span>50%</span><span>100%</span></div>
-      <div class="ps-detail" id="psDetail"></div>
-    </div>
   </div>
 
   <p class="note">
@@ -324,6 +353,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
       <span class="changelog-title">更新履歴</span>
       <span class="changelog-item"><span class="changelog-ver">v1.0</span> 2026.05.12 — 公開</span>
       <span class="changelog-item"><span class="changelog-ver">v1.1</span> 2026.05.13 — TRISS b値表示・鋭的外傷係数修正・AIS=6時ISS自動75対応・未入力アラート・GCSをバイタルに統合・UI改善</span>
+      <span class="changelog-item"><span class="changelog-ver">v1.2</span> 2026.05.13 — TRISS 2009改訂版（Schluter et al. 2010）を追加・JTRISS削除、2式並記に整理</span>
     </span>
     <span class="author">© K.Ogawa</span>
   </p>
@@ -480,15 +510,21 @@ function calculate() {
   const b0       = mech === "penetrating" ? -2.5355 : -0.4499;
   const rtsCoef  = mech === "penetrating" ?  0.9934 :  0.8085;
   const issCoef  = mech === "penetrating" ? -0.0651 : -0.0835;
-  const b  = b0 + (rtsCoef * rts) + (issCoef * iss) + ageCoeff;
-  const ps = 1 / (1 + Math.exp(-b));
+  const bBoyd  = b0 + (rtsCoef * rts) + (issCoef * iss) + ageCoeff;
+  const psBoyd = 1 / (1 + Math.exp(-bBoyd));
+
+  // Schluter 2010（NTDB imputed）— 鈍的のみ係数確認済み
+  // 鈍的：b0=-0.4499, b1=0.8085, b2=-0.0835, b3(age≥55)=-1.7430
+  const schluterAvail = mech === "blunt";
+  const sAgeCoeff = age >= 55 ? -1.7430 : 0;
+  const bSchluter  = -0.4499 + (0.8085 * rts) + (-0.0835 * iss) + sAgeCoeff;
+  const psSchluter = 1 / (1 + Math.exp(-bSchluter));
 
   // 結果表示
   const resultsEl = document.getElementById("results");
   resultsEl.style.display = "block";
   document.getElementById("issVal").textContent = iss;
   document.getElementById("rtsVal").textContent = rts.toFixed(2);
-  document.getElementById("psVal").textContent  = (ps * 100).toFixed(1) + "%";
 
   const usedNames = top3.filter(x => x.v > 0).map(x => x.name).join("・");
   document.getElementById("issTop").textContent = usedNames || "損傷なし";
@@ -498,15 +534,39 @@ function calculate() {
     : top3.map(x => x.v + "²").join(" + ") + " = " + iss;
   document.getElementById("issFormula").textContent = formula;
 
-  // TRISS内訳
-  const rtsComponent = rtsCoef * rts;
-  const issComponent = issCoef * iss;
-  document.getElementById("trissDetail").style.display = "block";
-  document.getElementById("td_b0").textContent  = b0.toFixed(4) + "（" + (mech==="penetrating"?"鋭的":"鈍的") + "）";
-  document.getElementById("td_rts").textContent = (rtsComponent >= 0 ? "+" : "") + rtsComponent.toFixed(4) + "（" + rtsCoef + "×RTS）";
-  document.getElementById("td_iss").textContent = issComponent.toFixed(4) + "（" + issCoef + "×ISS）";
-  document.getElementById("td_age").textContent = ageCoeff !== 0 ? ageCoeff.toFixed(4) : "0（<55歳）";
-  document.getElementById("td_b").textContent   = b.toFixed(4);
+  // Boyd 結果
+  document.getElementById("psBoyd").textContent = (psBoyd * 100).toFixed(1) + "%";
+  document.getElementById("psBoydNote").textContent =
+    mech === "penetrating" ? "鋭的外傷（b₀=−2.5355）" : "鈍的外傷（b₀=−0.4499）";
+  document.getElementById("trissDetailBoyd").style.display = "block";
+  document.getElementById("tb_b0").textContent  = b0.toFixed(4);
+  document.getElementById("tb_rts").textContent = "+" + (rtsCoef * rts).toFixed(4) + "（" + rtsCoef + "×RTS）";
+  document.getElementById("tb_iss").textContent = (issCoef * iss).toFixed(4) + "（" + issCoef + "×ISS）";
+  document.getElementById("tb_age").textContent = ageCoeff !== 0 ? ageCoeff.toFixed(4) + "（≥55歳）" : "0（<55歳）";
+  document.getElementById("tb_b").textContent   = bBoyd.toFixed(4);
+  const pctBoyd = Math.min(100, Math.max(0, psBoyd * 100));
+  document.getElementById("psDotBoyd").style.left = pctBoyd + "%";
+
+  // Schluter 2010 結果
+  if (schluterAvail) {
+    document.getElementById("psSchluter").textContent = (psSchluter * 100).toFixed(1) + "%";
+    document.getElementById("psSchluterNote").textContent = "鈍的外傷（b₃=−1.7430、≥55歳補正）";
+    document.getElementById("trissDetailSchluter").style.display = "block";
+    document.getElementById("ts_b0").textContent  = "−0.4499";
+    document.getElementById("ts_rts").textContent = "+" + (0.8085 * rts).toFixed(4) + "（0.8085×RTS）";
+    document.getElementById("ts_iss").textContent = (-0.0835 * iss).toFixed(4) + "（−0.0835×ISS）";
+    document.getElementById("ts_age").textContent = sAgeCoeff !== 0 ? sAgeCoeff.toFixed(4) + "（≥55歳）" : "0（<55歳）";
+    document.getElementById("ts_b").textContent   = bSchluter.toFixed(4);
+    const pctSchluter = Math.min(100, Math.max(0, psSchluter * 100));
+    document.getElementById("psDotSchluter").style.left = pctSchluter + "%";
+  } else {
+    document.getElementById("psSchluter").textContent = "N/A";
+    document.getElementById("psSchluterNote").textContent = "鋭的外傷係数は未確認のため非表示";
+    document.getElementById("trissDetailSchluter").style.display = "none";
+    document.getElementById("psDotSchluter").style.left = "0%";
+  }
+
+  // JTRISS関連は削除済み
 
   // 重症度バー
   document.getElementById("severityWrap").style.display = "block";
@@ -526,14 +586,6 @@ function calculate() {
     document.getElementById("seg" + i).className =
       "severity-seg" + (i <= sIdx && iss > 0 ? " active-" + segs[i] : "");
   }
-
-  // 生存確率インジケーター
-  document.getElementById("psWrap").style.display = "block";
-  const pct = Math.min(100, Math.max(0, ps * 100));
-  document.getElementById("psDot").style.left = pct + "%";
-  const mechLabel = mech === "penetrating" ? "鋭的外傷" : "鈍的外傷";
-  document.getElementById("psDetail").innerHTML =
-    `<span>Ps = 1/(1+e<sup>−b</sup>)</span><span>${mechLabel} / ${age}歳</span>`;
 
   // 結果へスクロール
   resultsEl.scrollIntoView({behavior:"smooth", block:"start"});
@@ -558,9 +610,13 @@ function resetAll() {
   });
   document.getElementById("alertBox").classList.remove("show");
   document.getElementById("results").style.display = "none";
-  document.getElementById("trissDetail").style.display = "none";
+  document.getElementById("trissDetailBoyd").style.display = "none";
+  document.getElementById("trissDetailSchluter").style.display = "none";
   document.getElementById("severityWrap").style.display = "none";
-  document.getElementById("psWrap").style.display = "none";
+  document.getElementById("psBoyd").textContent = "—";
+  document.getElementById("psSchluter").textContent = "—";
+  document.getElementById("psBoydNote").textContent = "";
+  document.getElementById("psSchluterNote").textContent = "";
 }
 
 renderAis();
